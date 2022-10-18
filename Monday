@@ -1,0 +1,16 @@
+let
+    Key = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjE4NjcwMTkxOSwidWlkIjoyODc4MTA4NiwiaWFkIjoiMjAyMi0xMC0xOFQxNjo1MTowNS4zOTNaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTA0MDY4NDIsInJnbiI6InVzZTEifQ.EogZusfqMSDX0dx2pzAcCF1PWk9DRcDpcsRsHHhvdMs",
+    Board = "3334423460",
+    Source = Web.Contents(
+	"https://api.monday.com/v2",
+	[
+		Headers=[
+			#"Method"="POST",
+			#"Content-Type"="application/json",
+			#"Authorization"="Bearer " & Key
+		],
+		Content=Text.ToBinary("{""query"": ""query { boards(ids: " & Board & ") { items { name, updated_at, group { title }, columns: column_values { id, text } } } }""}")
+	]
+    ),
+    Data = Table.FromList(Json.Document(Source)[data][boards]{0}[items], Record.FieldValues, {"Title", "UpdatedAt", "Group", "Columns"}),
+    #"Monday" 
